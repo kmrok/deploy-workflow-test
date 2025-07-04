@@ -1,0 +1,128 @@
+name: "Deploy to RC"
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "ブランチ名"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  check-branch-exists:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+      - name: "Check if specified branch exists"
+        uses: ./.github/actions/check-ref-exists
+        with:
+          ref: ${{ github.event.inputs.ref }}
+          ref-type: branch
+
+  notify-deployment-start:
+    needs: check-branch-exists
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+      - name: "Notify deployment start"
+        uses: ./.github/actions/slack-notify
+        with:
+          type: start
+          environment: "rc"
+          branch: ${{ github.event.inputs.ref }}
+          actor: ${{ github.actor }}
+          workflow: ${{ github.workflow }}
+          slack-webhook-url: https://hooks.slack.com/services/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
+
+  deploy:
+    needs: notify-deployment-start
+    runs-on: ubuntu-latest
+    environment: rc
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+      - name: "Build and Deploy to S3"
+        uses: ./.github/actions/build-and-deploy
+        with:
+          node-version: '18'
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+          s3-bucket-name: ${{ secrets.S3_BUCKET_NAME }}
+          s3-folder-name: "folder" # ここを変更する
+
+  notify-deployment-failure:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+      - name: "Notify deployment failure"
+        uses: ./.github/actions/slack-notify
+        with:
+          type: failure
+          environment: "rc"
+          branch: ${{ github.event.inputs.ref }}
+          actor: ${{ github.actor }}
+          workflow-run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          slack-webhook-url: https://hooks.slack.com/services/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
+
+  notify-deployment-success:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+      - name: "Notify deployment success"
+        uses: ./.github/actions/slack-notify
+        with:
+          type: success
+          environment: "rc"
+          branch: ${{ github.event.inputs.ref }}
+          actor: ${{ github.actor }}
+          workflow-run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          slack-webhook-url: https://hooks.slack.com/services/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
+
+  update-release-file:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      - name: "Update .release.yaml"
+        env:
+          ENVIRONMENT: rc
+          REF: ${{ github.event.inputs.ref }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          # Check if yq is available, install if not
+          if ! command -v yq &> /dev/null; then
+            echo "Installing yq..."
+            sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+            sudo chmod +x /usr/local/bin/yq
+          else
+            echo "yq is already available: $(yq --version)"
+          fi
+
+          DEPLOYED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          yq eval ".${ENVIRONMENT}.ref = \"${REF}\"" -i .release.yaml
+          yq eval ".${ENVIRONMENT}.deployed_at = \"${DEPLOYED_AT}\"" -i .release.yaml
+          yq eval ".${ENVIRONMENT}.deployed_by = \"${ACTOR}\"" -i .release.yaml
+
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .release.yaml
+          git commit -m "Update ${ENVIRONMENT} deployment info: ${REF} by ${ACTOR}"
+          git push
+        shell: bash

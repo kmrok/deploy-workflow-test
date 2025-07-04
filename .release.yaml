@@ -1,0 +1,12 @@
+rc:
+  ref:
+  deployed_at:
+  deployed_by:
+stg:
+  ref:
+  deployed_at:
+  deployed_by:
+prd:
+  ref:
+  deployed_at:
+  deployed_by:
