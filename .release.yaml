@@ -3,9 +3,9 @@ rc:
   deployed_at: "2025-07-04T11:15:15Z"
   deployed_by: kmrok
 stg:
-  ref:
-  deployed_at:
-  deployed_by:
+  ref: v0.0.1
+  deployed_at: "2025-07-04T11:24:26Z"
+  deployed_by: kmrok
 prd:
   ref:
   deployed_at:
