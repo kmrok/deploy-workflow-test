@@ -1,0 +1,52 @@
+name: "Update Release File"
+description: "Update .release.yaml file with deployment information"
+
+inputs:
+  environment:
+    description: "Environment name (rc, stg, prd)"
+    required: true
+  ref:
+    description: "Git reference (branch or tag)"
+    required: true
+  actor:
+    description: "User who triggered the deployment"
+    required: true
+  github-token:
+    description: "GitHub token for committing changes"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Checkout repository"
+      uses: actions/checkout@v4
+      with:
+        token: ${{ inputs.github-token }}
+        fetch-depth: 0
+    - name: "Update .release.yaml"
+      run: |
+        # Check if yq is available, install if not
+        if ! command -v yq &> /dev/null; then
+          echo "Installing yq..."
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+        else
+          echo "yq is already available: $(yq --version)"
+        fi
+
+        # Get current timestamp in ISO 8601 format
+        DEPLOYED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        ENV="${{ inputs.environment }}"
+
+        # Update .release.yaml for the specified environment
+        yq eval '.'$ENV'.ref = "${{ inputs.ref }}"' -i .release.yaml
+        yq eval '.'$ENV'.deployed_at = "'$DEPLOYED_AT'"' -i .release.yaml
+        yq eval '.'$ENV'.deployed_by = "${{ inputs.actor }}"' -i .release.yaml
+
+        # Commit and push changes
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .release.yaml
+        git commit -m "Update $ENV deployment info: ${{ inputs.ref }} by ${{ inputs.actor }}"
+        git push
+      shell: bash
