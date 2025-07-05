@@ -17,11 +17,10 @@ on:
         description: "S3 folder path (e.g., 'releases/v1.0')"
         required: true
         type: string
-      build-directory:
-        description: "Build output directory"
+      build-output:
+        description: "Build output file path"
         required: false
         type: string
-        default: "./dist"
       enable-cache:
         description: "Enable npm cache (npm, yarn, pnpm, or empty to disable)"
         required: false
@@ -69,6 +68,6 @@ jobs:
           aws-region: ${{ inputs.aws-region }}
       - name: "Deploy to S3"
         run: |
-          aws s3 sync ${{ inputs.build-directory }} "s3://${{ secrets.S3_BUCKET_NAME }}/${{ inputs.s3-folder-name }}" --delete
-          echo "✅ Deployment to S3 completed: s3://${{ secrets.S3_BUCKET_NAME }}/${{ inputs.s3-folder-name }}"
+          aws s3 cp ${{ inputs.build-output }} "s3://${{ secrets.S3_BUCKET_NAME }}/${{ inputs.s3-folder-name }}/$(basename ${{ inputs.build-output }})"
+          echo "✅ Deployment to S3 completed: s3://${{ secrets.S3_BUCKET_NAME }}/${{ inputs.s3-folder-name }}/$(basename ${{ inputs.build-output }})"
         shell: bash

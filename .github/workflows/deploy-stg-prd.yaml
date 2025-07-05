@@ -87,6 +87,7 @@ jobs:
       node-version: '18'
       aws-region: ap-northeast-1
       s3-folder-name: "folder"
+      build-output: "./dist/hoge.js" # TODO: ここを変える
       environment: ${{ github.event.inputs.env }}
     secrets: inherit
 
