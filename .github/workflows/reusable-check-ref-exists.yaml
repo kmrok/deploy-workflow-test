@@ -1,5 +1,4 @@
 name: "Reusable Check Git Reference Exists"
-description: "Check if specified branch or tag exists in the repository (reusable workflow)"
 
 on:
   workflow_call:

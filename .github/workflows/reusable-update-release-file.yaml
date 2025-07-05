@@ -1,4 +1,4 @@
-name: "Update Release File"
+name: "Reusable Update Release File"
 
 on:
   workflow_call:
@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       ref:
-        description: "デプロイされたブランチ名またはタグ名"
+        description: "デプロイ対象のブランチ名またはタグ名"
         required: true
         type: string
       actor:

@@ -1,5 +1,4 @@
 name: "Reusable Slack Notification"
-description: "Send notification to Slack (reusable workflow)"
 
 on:
   workflow_call:

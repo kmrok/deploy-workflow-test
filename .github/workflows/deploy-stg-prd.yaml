@@ -11,7 +11,7 @@ on:
           - "stg"
           - "prd"
       ref:
-        description: "タグ名"
+        description: "デプロイ対象のタグ"
         required: true
 
 permissions:

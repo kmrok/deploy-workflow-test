@@ -1,5 +1,4 @@
 name: "Reusable Build and Deploy to S3"
-description: "Build Node.js project and deploy to S3 (reusable workflow)"
 
 on:
   workflow_call:
