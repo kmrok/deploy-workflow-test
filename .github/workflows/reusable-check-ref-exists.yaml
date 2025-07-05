@@ -1,0 +1,46 @@
+name: "Reusable Check Git Reference Exists"
+description: "Check if specified branch or tag exists in the repository (reusable workflow)"
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: "Git reference (branch or tag name)"
+        required: true
+        type: string
+      ref-type:
+        description: "Type of reference to check (branch or tag)"
+        required: true
+        type: string
+        default: "branch"
+
+jobs:
+  check-ref-exists:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: "Check if branch exists"
+        if: ${{ inputs['ref-type'] == 'branch' }}
+        run: |
+          BRANCH_NAME="${{ inputs.ref }}"
+          if git ls-remote --heads origin "$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
+            echo "✅ Branch '$BRANCH_NAME' exists"
+          else
+            echo "❌ Branch '$BRANCH_NAME' does not exist"
+            exit 1
+          fi
+        shell: bash
+      - name: "Check if tag exists"
+        if: ${{ inputs['ref-type'] == 'tag' }}
+        run: |
+          TAG_NAME="${{ inputs.ref }}"
+          if git ls-remote --tags origin "$TAG_NAME" | grep -q "$TAG_NAME"; then
+            echo "✅ Tag '$TAG_NAME' exists"
+          else
+            echo "❌ Tag '$TAG_NAME' does not exist"
+            exit 1
+          fi
+        shell: bash

@@ -1,0 +1,125 @@
+name: "Reusable Slack Notification"
+description: "Send notification to Slack (reusable workflow)"
+
+on:
+  workflow_call:
+    inputs:
+      type:
+        description: "Notification type (start, success, failure, ref-mismatch)"
+        required: true
+        type: string
+      environment:
+        description: "Environment name"
+        required: true
+        type: string
+      branch:
+        description: "Branch name"
+        required: true
+        type: string
+      actor:
+        description: "User who triggered the workflow"
+        required: true
+        type: string
+      workflow:
+        description: "Workflow name"
+        required: false
+        type: string
+        default: ""
+      workflow-run-url:
+        description: "Workflow run URL"
+        required: false
+        type: string
+        default: ""
+      slack-webhook-url:
+        description: "Slack webhook URL"
+        required: true
+        type: string
+
+jobs:
+  slack-notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Send start notification"
+        if: ${{ inputs.type == 'start' }}
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          webhook: ${{ inputs.slack-webhook-url }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "🚀 デプロイを開始します",
+              "attachments": [
+                {
+                  "color": "good",
+                  "fields": [
+                    { "title": "Environment", "value": "${{ inputs.environment }}", "short": true },
+                    { "title": "Branch", "value": "${{ inputs.branch }}", "short": true },
+                    { "title": "Triggered by", "value": "${{ inputs.actor }}", "short": true },
+                    { "title": "Workflow", "value": "${{ inputs.workflow }}", "short": true }
+                  ]
+                }
+              ]
+            }
+      - name: "Send success notification"
+        if: ${{ inputs.type == 'success' }}
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          webhook: ${{ inputs.slack-webhook-url }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "✅ デプロイが完了しました",
+              "attachments": [
+                {
+                  "color": "good",
+                  "fields": [
+                    { "title": "Environment", "value": "${{ inputs.environment }}", "short": true },
+                    { "title": "Branch", "value": "${{ inputs.branch }}", "short": true },
+                    { "title": "Triggered by", "value": "${{ inputs.actor }}", "short": true },
+                    { "title": "Workflow Run", "value": "<${{ inputs.workflow-run-url }}|View Details>", "short": true }
+                  ]
+                }
+              ]
+            }
+      - name: "Send failure notification"
+        if: ${{ inputs.type == 'failure' }}
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          webhook: ${{ inputs.slack-webhook-url }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "❌ デプロイが失敗しました",
+              "attachments": [
+                {
+                  "color": "danger",
+                  "fields": [
+                    { "title": "Environment", "value": "${{ inputs.environment }}", "short": true },
+                    { "title": "Branch", "value": "${{ inputs.branch }}", "short": true },
+                    { "title": "Triggered by", "value": "${{ inputs.actor }}", "short": true },
+                    { "title": "Workflow Run", "value": "<${{ inputs.workflow-run-url }}|View Details>", "short": true }
+                  ]
+                }
+              ]
+            }
+      - name: "Send ref mismatch notification"
+        if: ${{ inputs.type == 'ref-mismatch' }}
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          webhook: ${{ inputs.slack-webhook-url }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "⚠️ PRD環境デプロイでrefの不整合が検出されました",
+              "attachments": [
+                {
+                  "color": "warning",
+                  "fields": [
+                    { "title": "Environment", "value": "${{ inputs.environment }}", "short": true },
+                    { "title": "Input Ref", "value": "${{ inputs.branch }}", "short": true },
+                    { "title": "Triggered by", "value": "${{ inputs.actor }}", "short": true },
+                    { "title": "Error", "value": "入力されたrefがSTG環境のrefと一致しません。PRD環境にはSTG環境と同じrefをデプロイしてください。", "short": false }
+                  ]
+                }
+              ]
+            }

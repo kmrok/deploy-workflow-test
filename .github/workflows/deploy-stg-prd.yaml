@@ -19,15 +19,10 @@ permissions:
 
 jobs:
   check-tag-exists:
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Checkout repository"
-        uses: actions/checkout@v4
-      - name: "Check if specified tag exists"
-        uses: ./.github/actions/check-ref-exists
-        with:
-          ref: ${{ github.event.inputs.ref }}
-          ref-type: tag
+    uses: ./.github/workflows/reusable-check-ref-exists.yaml
+    with:
+      ref: ${{ github.event.inputs.ref }}
+      ref-type: tag
 
   check-prd-ref:
     needs: check-tag-exists
@@ -65,86 +60,60 @@ jobs:
 
   notify-ref-mismatch:
     needs: check-prd-ref
-    runs-on: ubuntu-latest
     if: failure() && github.event.inputs.env == 'prd'
-    steps:
-      - name: "Checkout repository"
-        uses: actions/checkout@v4
-      - name: "Notify ref mismatch to Slack"
-        uses: ./.github/actions/slack-notify
-        with:
-          type: ref-mismatch
-          environment: ${{ github.event.inputs.env }}
-          branch: ${{ github.event.inputs.ref }}
-          actor: ${{ github.actor }}
-          slack-webhook-url: https://hooks.slack.com/services/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
+    uses: ./.github/workflows/reusable-slack-notify.yaml
+    with:
+      type: ref-mismatch
+      environment: ${{ github.event.inputs.env }}
+      branch: ${{ github.event.inputs.ref }}
+      actor: ${{ github.actor }}
+      slack-webhook-url: https://hooks.slack.com/services/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
 
   notify-deployment-start:
     needs: [check-tag-exists, check-prd-ref]
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Checkout repository"
-        uses: actions/checkout@v4
-      - name: "Notify deployment start"
-        uses: ./.github/actions/slack-notify
-        with:
-          type: start
-          environment: ${{ github.event.inputs.env }}
-          branch: ${{ github.event.inputs.ref }}
-          actor: ${{ github.actor }}
-          workflow: ${{ github.workflow }}
-          slack-webhook-url: https://hooks.slack.com/services/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
+    uses: ./.github/workflows/reusable-slack-notify.yaml
+    with:
+      type: start
+      environment: ${{ github.event.inputs.env }}
+      branch: ${{ github.event.inputs.ref }}
+      actor: ${{ github.actor }}
+      workflow: ${{ github.workflow }}
+      slack-webhook-url: https://hooks.slack.com/services/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
 
   deploy:
     needs: notify-deployment-start
-    runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.env }}
-    steps:
-      - name: "Checkout repository"
-        uses: actions/checkout@v4
-      - name: "Build and Deploy to S3"
-        uses: ./.github/actions/build-and-deploy
-        with:
-          node-version: '18'
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-1
-          s3-bucket-name: ${{ secrets.S3_BUCKET_NAME }}
-          s3-folder-name: "folder" # ここを変更する
+    uses: ./.github/workflows/reusable-build-and-deploy.yaml
+    with:
+      node-version: '18'
+      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      aws-region: ap-northeast-1
+      s3-bucket-name: ${{ secrets.S3_BUCKET_NAME }}
+      s3-folder-name: "folder"
 
   notify-deployment-failure:
     needs: deploy
-    runs-on: ubuntu-latest
     if: failure()
-    steps:
-      - name: "Checkout repository"
-        uses: actions/checkout@v4
-      - name: "Notify deployment failure"
-        uses: ./.github/actions/slack-notify
-        with:
-          type: failure
-          environment: ${{ github.event.inputs.env }}
-          branch: ${{ github.event.inputs.ref }}
-          actor: ${{ github.actor }}
-          workflow-run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          slack-webhook-url: https://hooks.slack.com/services/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
+    uses: ./.github/workflows/reusable-slack-notify.yaml
+    with:
+      type: failure
+      environment: ${{ github.event.inputs.env }}
+      branch: ${{ github.event.inputs.ref }}
+      actor: ${{ github.actor }}
+      workflow-run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      slack-webhook-url: https://hooks.slack.com/services/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
 
   notify-deployment-success:
     needs: deploy
-    runs-on: ubuntu-latest
     if: success()
-    steps:
-      - name: "Checkout repository"
-        uses: actions/checkout@v4
-      - name: "Notify deployment success"
-        uses: ./.github/actions/slack-notify
-        with:
-          type: success
-          environment: ${{ github.event.inputs.env }}
-          branch: ${{ github.event.inputs.ref }}
-          actor: ${{ github.actor }}
-          workflow-run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          slack-webhook-url: https://hooks.slack.com/services/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
+    uses: ./.github/workflows/reusable-slack-notify.yaml
+    with:
+      type: success
+      environment: ${{ github.event.inputs.env }}
+      branch: ${{ github.event.inputs.ref }}
+      actor: ${{ github.actor }}
+      workflow-run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      slack-webhook-url: https://hooks.slack.com/services/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
 
   update-release-file:
     needs: deploy
