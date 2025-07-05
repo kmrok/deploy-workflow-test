@@ -10,6 +10,8 @@ on:
 permissions:
   contents: write
 
+concurrency: deploy
+
 jobs:
   check-branch-exists:
     uses: ./.github/workflows/reusable-check-ref-exists.yaml

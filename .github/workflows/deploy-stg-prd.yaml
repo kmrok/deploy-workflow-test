@@ -17,6 +17,8 @@ on:
 permissions:
   contents: write
 
+concurrency: deploy
+
 jobs:
   check-tag-exists:
     uses: ./.github/workflows/reusable-check-ref-exists.yaml
