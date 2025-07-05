@@ -36,10 +36,10 @@ jobs:
       aws-region: ap-northeast-1
       s3-folder-name: "folder"
       environment: "rc"
+      s3-bucket-name: ${{ secrets.S3_BUCKET_NAME }}
     secrets:
       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      s3-bucket-name: ${{ secrets.S3_BUCKET_NAME }}
 
   notify-deployment-failure:
     needs: deploy

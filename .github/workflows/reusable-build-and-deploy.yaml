@@ -32,15 +32,16 @@ on:
         required: false
         type: string
         default: ""
+      s3-bucket-name:
+        description: "S3 bucket name for deployment"
+        required: true
+        type: string
     secrets:
       aws-access-key-id:
         description: "AWS Access Key ID"
         required: true
       aws-secret-access-key:
         description: "AWS Secret Access Key"
-        required: true
-      s3-bucket-name:
-        description: "S3 bucket name for deployment"
         required: true
 
 jobs:
@@ -67,6 +68,6 @@ jobs:
           aws-region: ${{ inputs.aws-region }}
       - name: "Deploy to S3"
         run: |
-          aws s3 sync ${{ inputs.build-directory }} "s3://${{ secrets.s3-bucket-name }}/${{ inputs.s3-folder-name }}" --delete
-          echo "✅ Deployment to S3 completed: s3://${{ secrets.s3-bucket-name }}/${{ inputs.s3-folder-name }}"
+          aws s3 sync ${{ inputs.build-directory }} "s3://${{ inputs.s3-bucket-name }}/${{ inputs.s3-folder-name }}" --delete
+          echo "✅ Deployment to S3 completed: s3://${{ inputs.s3-bucket-name }}/${{ inputs.s3-folder-name }}"
         shell: bash
