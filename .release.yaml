@@ -1,6 +1,6 @@
 rc:
   ref: main
-  deployed_at: "2025-07-05T16:37:01Z"
+  deployed_at: "2025-07-05T17:04:06Z"
   deployed_by: kmrok
 stg:
   ref: v0.0.1
