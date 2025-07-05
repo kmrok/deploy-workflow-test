@@ -1,12 +1,12 @@
 rc:
   ref: main
-  deployed_at: "2025-07-05T16:13:42Z"
+  deployed_at: "2025-07-05T16:37:01Z"
   deployed_by: kmrok
 stg:
   ref: v0.0.1
-  deployed_at: "2025-07-05T16:07:36Z"
+  deployed_at: "2025-07-05T16:38:13Z"
   deployed_by: kmrok
 prd:
   ref: v0.0.1
-  deployed_at: "2025-07-05T16:08:55Z"
+  deployed_at: "2025-07-05T16:39:43Z"
   deployed_by: kmrok
