@@ -1,0 +1,57 @@
+name: "Update Release File"
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "環境名 (rc, stg, prd)"
+        required: true
+        type: string
+      ref:
+        description: "デプロイされたブランチ名またはタグ名"
+        required: true
+        type: string
+      actor:
+        description: "デプロイを実行したユーザー"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  update-release-file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      - name: "Update .release.yaml"
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
+          REF: ${{ inputs.ref }}
+          ACTOR: ${{ inputs.actor }}
+        run: |
+          # yqがインストールされているか確認し、なければインストールします。
+          if ! command -v yq &> /dev/null; then
+            echo "Installing yq..."
+            sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+            sudo chmod +x /usr/local/bin/yq
+          else
+            echo "yq is already available: $(yq --version)"
+          fi
+
+          DEPLOYED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          yq eval ".${ENVIRONMENT}.ref = \"${REF}\"" -i .release.yaml
+          yq eval ".${ENVIRONMENT}.deployed_at = \"${DEPLOYED_AT}\"" -i .release.yaml
+          yq eval ".${ENVIRONMENT}.deployed_by = \"${ACTOR}\"" -i .release.yaml
+
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .release.yaml
+          git commit -m "Update ${ENVIRONMENT} deployment info: ${REF} by ${ACTOR}"
+          git push
+        shell: bash
