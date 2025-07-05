@@ -8,5 +8,5 @@ stg:
   deployed_by: kmrok
 prd:
   ref: v0.0.1
-  deployed_at: "2025-07-05T17:17:22Z"
+  deployed_at: "2025-07-05T17:46:44Z"
   deployed_by: kmrok
