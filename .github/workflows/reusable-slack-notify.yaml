@@ -30,10 +30,10 @@ on:
         required: false
         type: string
         default: ""
-      slack-webhook-url:
+    secrets:
+      SLACK_WEBHOOK_URL:
         description: "Slack webhook URL"
         required: true
-        type: string
 
 jobs:
   slack-notify:
@@ -43,7 +43,7 @@ jobs:
         if: ${{ inputs.type == 'start' }}
         uses: slackapi/slack-github-action@v2.1.0
         with:
-          webhook: ${{ inputs.slack-webhook-url }}
+          webhook: ${{ inputs.SLACK_WEBHOOK_URL }}
           webhook-type: incoming-webhook
           payload: |
             {
@@ -64,7 +64,7 @@ jobs:
         if: ${{ inputs.type == 'success' }}
         uses: slackapi/slack-github-action@v2.1.0
         with:
-          webhook: ${{ inputs.slack-webhook-url }}
+          webhook: ${{ inputs.SLACK_WEBHOOK_URL }}
           webhook-type: incoming-webhook
           payload: |
             {
@@ -85,7 +85,7 @@ jobs:
         if: ${{ inputs.type == 'failure' }}
         uses: slackapi/slack-github-action@v2.1.0
         with:
-          webhook: ${{ inputs.slack-webhook-url }}
+          webhook: ${{ inputs.SLACK_WEBHOOK_URL }}
           webhook-type: incoming-webhook
           payload: |
             {
@@ -106,7 +106,7 @@ jobs:
         if: ${{ inputs.type == 'ref-mismatch' }}
         uses: slackapi/slack-github-action@v2.1.0
         with:
-          webhook: ${{ inputs.slack-webhook-url }}
+          webhook: ${{ inputs.SLACK_WEBHOOK_URL }}
           webhook-type: incoming-webhook
           payload: |
             {
