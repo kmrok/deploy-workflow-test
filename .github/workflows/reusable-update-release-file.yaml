@@ -34,15 +34,15 @@ jobs:
           REF: ${{ inputs.ref }}
           ACTOR: ${{ inputs.actor }}
         run: |
-          DEPLOYED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git pull --rebase origin main
 
+          DEPLOYED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           yq eval ".${ENVIRONMENT}.ref = \"${REF}\"" -i .release.yaml
           yq eval ".${ENVIRONMENT}.deployed_at = \"${DEPLOYED_AT}\"" -i .release.yaml
           yq eval ".${ENVIRONMENT}.deployed_by = \"${ACTOR}\"" -i .release.yaml
 
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git pull --rebase origin main
           git add .release.yaml
           git commit -m "Update ${ENVIRONMENT} deployment info: ${REF} by ${ACTOR}"
           git push

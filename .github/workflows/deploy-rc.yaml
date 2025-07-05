@@ -10,7 +10,9 @@ on:
 permissions:
   contents: write
 
-concurrency: deploy
+concurrency:
+  group: deploy
+  cancel-in-progress: false
 
 jobs:
   check-branch-exists:
