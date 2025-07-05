@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       env:
-        description: "環境"
+        description: "デプロイ対象の環境"
         required: true
         type: choice
         options:
