@@ -30,20 +30,13 @@ jobs:
 
   deploy:
     needs: notify-deployment-start
-    # `uses` を使うジョブで environment を指定する場合、オブジェクト形式で記述します。
-    environment:
-      name: rc
     uses: ./.github/workflows/reusable-build-and-deploy.yaml
     with:
       node-version: '18'
       aws-region: ap-northeast-1
       s3-folder-name: "folder"
-      # reusable workflow側でも環境名が必要なため、inputとして渡します。
       environment: "rc"
-      s3-bucket-name: ${{ vars.S3_BUCKET_NAME }}
-    secrets:
-      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    secrets: inherit
 
   notify-deployment-failure:
     needs: deploy
