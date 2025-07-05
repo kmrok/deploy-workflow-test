@@ -68,6 +68,11 @@ jobs:
           aws-region: ${{ inputs.aws-region }}
       - name: "Deploy to S3"
         run: |
+<<<<<<< HEAD
           aws s3 cp ${{ inputs.build-output }} "s3://${{ secrets.S3_BUCKET_NAME }}/${{ inputs.s3-folder-name }}/$(basename ${{ inputs.build-output }})"
           echo "✅ Deployment to S3 completed: s3://${{ secrets.S3_BUCKET_NAME }}/${{ inputs.s3-folder-name }}/$(basename ${{ inputs.build-output }})"
+=======
+          aws s3 sync ${{ inputs.build-output }} "s3://${{ secrets.S3_BUCKET_NAME }}/${{ inputs.s3-folder-name }}" --delete
+          echo "✅ Deployment to S3 completed: s3://${{ secrets.S3_BUCKET_NAME }}/${{ inputs.s3-folder-name }}"
+>>>>>>> 0921ff7329022aa63531d5274ea4ae4d3ab2cfaa
         shell: bash
