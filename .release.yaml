@@ -3,8 +3,8 @@ rc:
   deployed_at: "2025-07-05T18:03:52Z"
   deployed_by: kmrok
 stg:
-  ref: v0.0.1
-  deployed_at: "2025-07-05T17:06:47Z"
+  ref: v0.0.2
+  deployed_at: "2025-07-05T18:08:57Z"
   deployed_by: kmrok
 prd:
   ref: v0.0.1
