@@ -36,9 +36,9 @@ jobs:
     needs: notify-deployment-start
     uses: ./.github/workflows/reusable-build-and-deploy.yaml
     with:
-      node-version: '18'
+      node-version: '22'
       aws-region: ap-northeast-1
-      s3-folder-name: "folder"
+      s3-folder-name: "folder/hoge" # TODO: ここを変える
       build-output: "./dist/hoge.js" # TODO: ここを変える
       environment: "rc"
     secrets: inherit
