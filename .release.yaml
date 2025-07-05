@@ -1,12 +1,12 @@
 rc:
-  ref:
-  deployed_at:
-  deployed_by:
+  ref: main
+  deployed_at: "2025-07-05T16:04:57Z"
+  deployed_by: kmrok
 stg:
-  ref:
-  deployed_at:
-  deployed_by:
+  ref: v0.0.1
+  deployed_at: "2025-07-05T16:07:36Z"
+  deployed_by: kmrok
 prd:
-  ref:
-  deployed_at:
-  deployed_by:
+  ref: v0.0.1
+  deployed_at: "2025-07-05T16:08:55Z"
+  deployed_by: kmrok
