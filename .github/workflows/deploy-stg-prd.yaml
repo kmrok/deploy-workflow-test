@@ -85,11 +85,13 @@ jobs:
     uses: ./.github/workflows/reusable-build-and-deploy.yaml
     with:
       node-version: '18'
+      aws-region: ap-northeast-1
+      s3-folder-name: "folder"
+      environment: ${{ github.event.inputs.env }}
+    secrets:
       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      aws-region: ap-northeast-1
       s3-bucket-name: ${{ secrets.S3_BUCKET_NAME }}
-      s3-folder-name: "folder"
 
   notify-deployment-failure:
     needs: deploy
