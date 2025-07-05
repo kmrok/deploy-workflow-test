@@ -67,7 +67,6 @@ jobs:
       environment: ${{ github.event.inputs.env }}
       branch: ${{ github.event.inputs.ref }}
       actor: ${{ github.actor }}
-      slack-webhook-url: https://hooks.slack.com/services/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
     secrets: inherit
 
   notify-deployment-start:
@@ -79,7 +78,6 @@ jobs:
       branch: ${{ github.event.inputs.ref }}
       actor: ${{ github.actor }}
       workflow: ${{ github.workflow }}
-      slack-webhook-url: https://hooks.slack.com/services/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
     secrets: inherit
 
   deploy:
@@ -102,7 +100,6 @@ jobs:
       branch: ${{ github.event.inputs.ref }}
       actor: ${{ github.actor }}
       workflow-run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      slack-webhook-url: https://hooks.slack.com/services/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
     secrets: inherit
 
   notify-deployment-success:
@@ -115,7 +112,6 @@ jobs:
       branch: ${{ github.event.inputs.ref }}
       actor: ${{ github.actor }}
       workflow-run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      slack-webhook-url: https://hooks.slack.com/services/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
     secrets: inherit
 
   update-release-file:
