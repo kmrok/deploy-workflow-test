@@ -36,14 +36,6 @@ jobs:
         uses: actions/checkout@v4
       - name: "Check PRD ref against STG ref"
         run: |
-          if ! command -v yq &> /dev/null; then
-            echo "Installing yq..."
-            sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-            sudo chmod +x /usr/local/bin/yq
-          else
-            echo "yq is already available: $(yq --version)"
-          fi
-
           if [ "${{ github.event.inputs.env }}" != "prd" ]; then
             echo "🔄 Not PRD environment, skipping ref check"
             exit 0
