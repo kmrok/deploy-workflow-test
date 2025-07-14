@@ -7,6 +7,6 @@ stg:
   deployed_at: "2025-07-14T01:09:03Z"
   deployed_by: kmrok
 prd:
-  ref: v0.0.1
-  deployed_at: "2025-07-14T01:10:11Z"
+  ref: v0.0.2
+  deployed_at: "2025-07-14T01:12:02Z"
   deployed_by: kmrok
