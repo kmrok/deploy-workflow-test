@@ -21,8 +21,21 @@ jobs:
       ref: ${{ github.event.inputs.ref }}
       ref-type: branch
 
+  notify-ref-not-found:
+    needs: check-branch-exists
+    if: failure()
+    uses: ./.github/workflows/reusable-slack-notify.yaml
+    with:
+      type: ref-not-found
+      environment: rc
+      branch: ${{ github.event.inputs.ref }}
+      actor: ${{ github.actor }}
+      workflow-run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    secrets: inherit
+
   notify-deployment-start:
     needs: check-branch-exists
+    if: success()
     uses: ./.github/workflows/reusable-slack-notify.yaml
     with:
       type: start

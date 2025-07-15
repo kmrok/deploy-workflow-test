@@ -28,8 +28,21 @@ jobs:
       ref: ${{ github.event.inputs.ref }}
       ref-type: tag
 
+  notify-ref-not-found:
+    needs: check-tag-exists
+    if: failure()
+    uses: ./.github/workflows/reusable-slack-notify.yaml
+    with:
+      type: ref-not-found
+      environment: ${{ github.event.inputs.env }}
+      branch: ${{ github.event.inputs.ref }}
+      actor: ${{ github.actor }}
+      workflow-run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    secrets: inherit
+
   check-prd-ref:
     needs: check-tag-exists
+    if: success()
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout repository"

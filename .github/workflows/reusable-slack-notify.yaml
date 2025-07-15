@@ -123,3 +123,24 @@ jobs:
                 }
               ]
             }
+      - name: "Send ref not found notification"
+        if: ${{ inputs.type == 'ref-not-found' }}
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "⚠️ refが見つかりません",
+              "attachments": [
+                {
+                  "color": "warning",
+                  "fields": [
+                    { "title": "Environment", "value": "${{ inputs.environment }}", "short": true },
+                    { "title": "Input Ref", "value": "${{ inputs.branch }}", "short": true },
+                    { "title": "Triggered by", "value": "${{ inputs.actor }}", "short": true },
+                    { "title": "Error", "value": "入力されたrefが見つかりません。", "short": false }
+                  ]
+                }
+              ]
+            }
