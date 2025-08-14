@@ -21,19 +21,20 @@ jobs:
       ref: ${{ github.event.inputs.ref }}
       ref-type: tag
 
-  notify-deployment-start:
-    needs: check-tag-exists
-    uses: ./.github/workflows/reusable-slack-notify.yaml
-    with:
-      type: start
-      environment: prd
-      branch: ${{ github.event.inputs.ref }}
-      actor: ${{ github.actor }}
-      workflow: ${{ github.workflow }}
-    secrets: inherit
+  # notify-deployment-start:
+  #   needs: check-tag-exists
+  #   uses: ./.github/workflows/reusable-slack-notify.yaml
+  #   with:
+  #     type: start
+  #     environment: prd
+  #     branch: ${{ github.event.inputs.ref }}
+  #     actor: ${{ github.actor }}
+  #     workflow: ${{ github.workflow }}
+  #   secrets: inherit
 
   deploy:
-    needs: notify-deployment-start
+    # needs: notify-deployment-start
+    needs: check-tag-exists
     uses: ./.github/workflows/reusable-build-and-deploy.yaml
     with:
       node-version: '22'
@@ -43,29 +44,29 @@ jobs:
       environment: prd
     secrets: inherit
 
-  notify-deployment-failure:
-    needs: deploy
-    if: failure()
-    uses: ./.github/workflows/reusable-slack-notify.yaml
-    with:
-      type: failure
-      environment: prd
-      branch: ${{ github.event.inputs.ref }}
-      actor: ${{ github.actor }}
-      workflow-run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-    secrets: inherit
+  # notify-deployment-failure:
+  #   needs: deploy
+  #   if: failure()
+  #   uses: ./.github/workflows/reusable-slack-notify.yaml
+  #   with:
+  #     type: failure
+  #     environment: prd
+  #     branch: ${{ github.event.inputs.ref }}
+  #     actor: ${{ github.actor }}
+  #     workflow-run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+  #   secrets: inherit
 
-  notify-deployment-success:
-    needs: deploy
-    if: success()
-    uses: ./.github/workflows/reusable-slack-notify.yaml
-    with:
-      type: success
-      environment: prd
-      branch: ${{ github.event.inputs.ref }}
-      actor: ${{ github.actor }}
-      workflow-run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-    secrets: inherit
+  # notify-deployment-success:
+  #   needs: deploy
+  #   if: success()
+  #   uses: ./.github/workflows/reusable-slack-notify.yaml
+  #   with:
+  #     type: success
+  #     environment: prd
+  #     branch: ${{ github.event.inputs.ref }}
+  #     actor: ${{ github.actor }}
+  #     workflow-run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+  #   secrets: inherit
 
   update-release-file:
     needs: deploy
