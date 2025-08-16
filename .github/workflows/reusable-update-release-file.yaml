@@ -33,9 +33,11 @@ jobs:
           ENVIRONMENT: ${{ inputs.environment }}
           REF: ${{ inputs.ref }}
           ACTOR: ${{ inputs.actor }}
+          GH_TOKEN: ${{ secrets.GH_BOT_TOKEN }}
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email "mrok.tohoku@gmail.com"
+          git config --local user.name "kmrok"
+          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
           git pull --rebase origin main
 
           DEPLOYED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
